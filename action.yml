@@ -13,6 +13,9 @@ inputs:
   command:
     description: "The command you would like AWS CloudFormation Linter to Run"
     required: false
+  template:
+    description: "The template file(s) you would like AWS CloudFormation Linter to Run"
+    required: false
 runs:
   using: "node16"
   main: "dist/index.js"

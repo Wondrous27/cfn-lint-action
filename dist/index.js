@@ -30,7 +30,7 @@ async function setup() {
 
   core.addPath(binPath);
 
-  if (!inputs.command) {
+  if (!inputs.command && !inputs.template) {
     return;
   }
 
@@ -83,8 +83,9 @@ module.exports = {
     try {
       const version = getInput("version", /^[\d.*]+$/, "0.*");
       const command = getInput("command", /^cfn-lint\s || null/, null);
+      const template = getInput("template", /^.*\.(yaml|yml)$ || null/, null);
       const python = getInput("python", /^.+$/, defaultPython);
-      return { version, command, python };
+      return { version, command, python, template };
     } catch (e) {
       core.error("Failed to Collect Inputs");
       throw e;
@@ -191,9 +192,14 @@ const exec = __nccwpck_require__(1514);
 const core = __nccwpck_require__(2186);
 
 module.exports = {
-  runCommand: async ({ command }) => {
+  runCommand: async ({ command, template }) => {
     try {
-      const response = await exec.exec(command);
+      let response;
+      if (template) {
+        response = await exec.exec("cfn-lint", [template]);
+      } else {
+        response = await exec.exec(command);
+      }
       core.info(`Ran command: ${command}. Response is: ${response}`);
       return response;
     } catch (e) {
